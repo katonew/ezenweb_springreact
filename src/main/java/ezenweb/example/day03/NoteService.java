@@ -55,6 +55,7 @@ public class NoteService {
         return false;
     }
     // 4. 수정
+    // @Transactional : 해당 메소드내 엔티티 객체 필드의 변화가 있을 경우 실시간으로 commit 처리
     @Transactional // import javax.transaction.Transactional
     public boolean update(NoteDto dto){
         log.info("service update in " + dto);
