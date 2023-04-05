@@ -20,8 +20,8 @@ public class NoteService {
 
     // 1. 쓰기
     public boolean write(NoteDto dto){
-        log.info("service write in " + dto); // dto안에는 nno X
-        // 1. DTO --> ENtity로 변환 후 SAVE
+        log.info("service write in " + dto); // dto 안 에는 nno X
+        // 1. DTO --> Entity 로 변환 후 SAVE
         NoteEntity entity = noteEntityRepository.save(dto.toEntity());
         if(entity.getNno()>=0){
             // 레코드가 생성 되었으면 등록성공
@@ -34,7 +34,7 @@ public class NoteService {
         log.info("service get in");
         // 1. 모든 Entity 호출
         List<NoteEntity> entityList = noteEntityRepository.findAll();
-        // 2. 모든 entity를 형변환
+        // 2. 모든 entity 를 형변환
         ArrayList<NoteDto> list = new ArrayList<>();
         entityList.forEach(e->{
             list.add(e.toDto());
