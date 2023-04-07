@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'       // 스프링 부트
-    compileOnly 'org.projectlombok:lombok'                                  //롬북
+    compileOnly 'org.projectlombok:lombok'                                  // 롬북
     annotationProcessor 'org.projectlombok:lombok'                          // 롬북
     testImplementation 'org.springframework.boot:spring-boot-starter-test'  // 스프링 부트 테스트
     runtimeOnly 'com.mysql:mysql-connector-j'                               // mysql driver
