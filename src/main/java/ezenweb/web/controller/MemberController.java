@@ -4,12 +4,19 @@ import ezenweb.web.domain.member.MemberDto;
 import ezenweb.web.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 
 @RestController // Controller+Responsebody
 @Slf4j // 로그가능
 @RequestMapping("/member")
 public class MemberController {
+    @GetMapping("/signup")
+    public Resource getSignup(){return new ClassPathResource("templates/member/signup.html");}
+    @GetMapping("/login")
+    public Resource getLogin(){return new ClassPathResource("templates/member/login.html");}
+
 
     // @Autowired 없이 객체[빈] 자동 생성
     // MemberService service = new MemberService();
@@ -42,5 +49,12 @@ public class MemberController {
         log.info("member info delete : " + mno);
         return memberService.delete(mno);
     }
+
+    // ------------스프링 시큐리티 사용 전----------------- //
+    @PostMapping("/login")
+    public boolean login(@RequestBody MemberDto dto){
+        return memberService.login(dto);
+    }
+
 
 }
