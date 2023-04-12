@@ -12,11 +12,19 @@ public interface MemberEntityRepository extends JpaRepository<MemberEntity, Inte
         // 인수로 들어온 email과 동일한 엔티티[레코드] 찾아서 반환
         // sql : select *from member where meamil = ?;
     MemberEntity findByMemail(String memail);
-    // 2. 해당 이메일과 비밀번호가 일치한 엔티티 존재 여부 확인
+    // 2. 해당 이메일과 비밀번호가 일치한 엔티티 반환
         // 인수로 들어온 meamil과 mpassword가 모두 일치한 엔티티[레코드] 찾아서 존재여부 반환
         // sql : select *from member where meamil =? and mpassword =?;
     Optional<MemberEntity> findByMemailAndMpassword(String memail, String mpassword);
+    // 3. [ 중복체크 ] 만약에 동일한 이메일이 존재하면 true 없으면 false
+    boolean existsByMemail(String memail);
+    // 4. 만약에 동일한 이메일과 패스워드가 존재하면 true 없으면 false
+    boolean existsByMemailAndMpassword(String memail, String mpassword);
 
+    // 아이디 찾기 [ 매개변수 : 이름과 전화번호 ]
+    Optional<MemberEntity> findByMnameAndMphone(String mname, String mphone);
+    // 비밀번호 찾기 [ 매개변수 : 아이디와 전화번호 ]
+    boolean existsByMemailAndMphone(String memail, String mphone);
 
 }
 
@@ -32,6 +40,16 @@ public interface MemberEntityRepository extends JpaRepository<MemberEntity, Inte
         .findBy필드(인수)       --> select *from member where meamil = ?;
         .findBy필드명And필드명  --> select *from member where meamil = ? and mpassword =?;
         .findBy필드명or필드명   --> select *from member where  meamil = ? or mpassword =?;
+        
+    검색여부 [ true , false ]
+        .existsBy필드명
 
+    Obtional
+        MemberEntity
+        Optional<MemberEntity>
+    검색된 레코드 반환
+        Optional<MemberEntity> : 레코드 1개
+        List<MemberEntity> : 레코드 여러개
+        boolean : 검색결과 [true, false]
 
 */

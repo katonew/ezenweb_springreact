@@ -8,6 +8,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
+
 @RestController // Controller+Responsebody
 @Slf4j // 로그가능
 @RequestMapping("/member")
@@ -29,14 +31,13 @@ public class MemberController {
     public boolean write(@RequestBody MemberDto dto){ // 자바 클래스 내 메소드 이름은 중복 불가능
         log.info("member info write : " + dto);
         return memberService.write(dto);
-
     }
     // 2. 회원정보 호출 [R]
     @GetMapping("/info")
-    public MemberDto info(@RequestParam int mno){
-        log.info("member info info : " + mno);
-        return memberService.info(mno);
+    public MemberDto info(){
+        return memberService.info();
     }
+
     // 3. 회원정보 수정[U]
     @PutMapping("/info")
     public boolean update(@RequestBody MemberDto dto){
@@ -50,11 +51,19 @@ public class MemberController {
         return memberService.delete(mno);
     }
 
+
+
+    /*
     // ------------스프링 시큐리티 사용 전----------------- //
+    // 로그인
     @PostMapping("/login")
     public boolean login(@RequestBody MemberDto dto){
         return memberService.login(dto);
     }
-
-
+    // 세션에 존재하는 정보 제거 == 로그아웃
+    @GetMapping("/logout")
+    public boolean logout(){
+        return memberService.logout();
+    }
+    */
 }
