@@ -29,7 +29,7 @@ public class MemberEntity extends BaseTime {
     private String mphone;      // 5. 회원전화번호
     @Column
     private String mrole;       // 6. 회원등급/권한 명
-    // toDto
+    // toDto출력용
     public MemberDto toDto() {
         return MemberDto.builder()
               .mno(this.mno)

@@ -60,10 +60,11 @@ public class MemberController {
     public boolean login(@RequestBody MemberDto dto){
         return memberService.login(dto);
     }
+    */
     // 세션에 존재하는 정보 제거 == 로그아웃
     @GetMapping("/logout")
     public boolean logout(){
-        return memberService.logout();
+        return true;
     }
-    */
+
 }

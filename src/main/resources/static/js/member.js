@@ -62,9 +62,9 @@ function getMember(){
                             <a href="#"> 비밀번호 찾기 </a>`
                 }else{
                     html = `${r.mname}님 반갑습니다.
-                        <button type="button">로그아웃</button>
-                        <button type="button">회원정보수정</button>
-                        <button type="button">회원탈퇴</button>
+                        <a href="/member/logout">로그아웃</a>
+                        <a href="#">회원정보수정</a>
+                         <a href="#">회원탈퇴</a>
                     `
                 }
                 document.querySelector('.infobox').innerHTML = html;
@@ -75,10 +75,10 @@ function getMember(){
 /*
 function getLogout(){
     $.ajax({
-        url : "member/logout",
+        url : "/member/logout",
         method : "get",
         success : (r)=>{
-            location.href = "/";
+            console.log(r);
         }
     })
 }

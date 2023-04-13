@@ -36,8 +36,9 @@ public class MemberService implements UserDetailsService {
             // dto 권한(여러개) 넣어주기
         // 1. 권한 목록 만들기
         Set<GrantedAuthority> 권한목록 = new HashSet<>();
-        // 2. 권한 객체 만들기 [DB에 존재하는 권한명으로 설정 ]
-        SimpleGrantedAuthority 권한명 = new SimpleGrantedAuthority(entity.getMrole());
+        // 2. 권한 객체 만들기 [DB에 존재하는 권한명(!! ROLE_권한명 )으로 설정 ]
+        // 권한 없을경우 : ROLE_ANONYMOUS , 권한 있을경우 ROLE_USER , ROLE_ADMIN 등
+        SimpleGrantedAuthority 권한명 = new SimpleGrantedAuthority("ROLE_"+entity.getMrole());
         // 3. 만든 권한 객체를 권한목록[컬렉션] 에 추가
         권한목록.add(권한명);
         // 4. UserDetails 에 권한 목록 대입
@@ -117,7 +118,7 @@ public class MemberService implements UserDetailsService {
             // SecurityContextHolder.getContext() : 시큐리티 저장 된 정보
             // SecurityContextHolder.getContext().getAuthentication() : 인증 정보 호출
         SecurityContextHolder.getContext().getAuthentication(); // 인증 전체 정보 호출
-        // log.info("Auth : " + SecurityContextHolder.getContext().getAuthentication());
+        log.info("Auth : " + SecurityContextHolder.getContext().getAuthentication());
         // log.info("Principal : " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal(); // 인증 된 회원의 정보 호출
         log.info("o :" + o);
