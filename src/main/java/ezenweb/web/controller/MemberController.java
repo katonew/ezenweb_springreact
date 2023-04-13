@@ -8,8 +8,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
-
 @RestController // Controller+Responsebody
 @Slf4j // 로그가능
 @RequestMapping("/member")
@@ -18,7 +16,10 @@ public class MemberController {
     public Resource getSignup(){return new ClassPathResource("templates/member/signup.html");}
     @GetMapping("/login")
     public Resource getLogin(){return new ClassPathResource("templates/member/login.html");}
-
+    @GetMapping("/find")
+    public Resource getFindId(){return new ClassPathResource("templates/member/findId.html");}
+    @GetMapping("/update")
+    public Resource getUpdate(){return new ClassPathResource("templates/member/update.html");}
 
     // @Autowired 없이 객체[빈] 자동 생성
     // MemberService service = new MemberService();
@@ -46,11 +47,22 @@ public class MemberController {
     }
     // 4. 회원정보 탈퇴[D]
     @DeleteMapping("/info")
-    public boolean delete(@RequestParam int mno){
-        log.info("member info delete : " + mno);
-        return memberService.delete(mno);
+    public boolean delete(@RequestParam String mpassword){
+        log.info("member info delete : " + mpassword);
+        return memberService.delete(mpassword);
     }
-
+    // 아이디 찾기
+    @PostMapping("/findId")
+    public String findId(@RequestBody MemberDto dto){
+        log.info("findId dto : " + dto);
+        return memberService.findId(dto);
+    }
+    // 비밀번호 찾기
+    @PostMapping("/findPw")
+    public int findPw(@RequestBody MemberDto dto){
+        log.info("findPw dto : " + dto);
+        return memberService.findPw(dto);
+    }
 
 
     /*

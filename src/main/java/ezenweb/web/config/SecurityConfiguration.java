@@ -43,6 +43,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .csrf() // 사이트 간 요청 위조 [ POST , PUT 은 HTTP 사용 불가능 ]
                         .ignoringAntMatchers("/member/info")        // 특정 매핑URL 은 CSRF 무시
                         .ignoringAntMatchers("/member/login")
+                        .ignoringAntMatchers("/member/findId")
+                        .ignoringAntMatchers("/member/findPw")
                 .and() // 기능 추가 할 때 사용되는 메소드
                     .formLogin()
                         .loginPage("/member/login")             // 로그인 페이지로 사용할 매핑 URL
@@ -55,7 +57,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .logout()
                         .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout"))     // 로그아웃 처리할 매핑 URL
                         .logoutSuccessUrl("/")                                                         // 로그 아웃 성공 시 매핑될 URL
-                        .invalidateHttpSession(true);                                                  // 세션 초기화
-
+                        .invalidateHttpSession(true)                                                  // 세션 초기화
+                .and()
+                    .oauth2Login() // 소셜 로그인 설정
+                        .defaultSuccessUrl("/") // 로그인 성공시 URL
+                        .userInfoEndpoint()
+                        .userService(memberService); // oauth2  서비스를 처리할 서비스 구현
     }
 }

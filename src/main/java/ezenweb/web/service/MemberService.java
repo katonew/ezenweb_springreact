@@ -12,18 +12,66 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+
+// UserDetailsService : 일반유저 서비스
+// OAuth2UserService : oauth2 유저 서비스
+// OAuth2UserService<OAuth2UserRequest, OAuth2User> : loadUser 구현
 
 @Service // 서비스 레이어
 @Slf4j
-public class MemberService implements UserDetailsService {
+public class MemberService implements UserDetailsService, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    // [ 스프링 시큐리티 적용했을때 사용되는 로그인 메소드 ]
+
+    // Oauth2 로그인 유저 가 로그인 했을때의 메소드
+    @Override // 토큰결과 [ JSON VS Map ]
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+
+        // 1. 인증[로그인] 결과 토큰 확인
+        OAuth2UserService oAuth2UserService = new DefaultOAuth2UserService();
+        log.info("SNS에서 넘어온 정보 : "+ oAuth2UserService.loadUser(userRequest));
+
+        // 2. 전달받은 정보 객체
+        // !!!! oauth 로그인한 유저의 정보  => oAuth2User.getAttributes()
+        OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
+
+        // 3. 클라이언트id 요청 [ 구글인지 네이버인지 카카오인지 ]
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        // 인가 객체 [ Oauth2User --->MemberDto 통합DTO(일반+oauth2)]
+        MemberDto dto = new MemberDto();
+
+            // 구글의 이메일 호출
+        String email = (String)oAuth2User.getAttributes().get("email");
+            // 구글의 이름 호출
+        String name = (String)oAuth2User.getAttributes().get("name");
+        dto.setMemail(email);
+        dto.setMname(name);
+        Set<GrantedAuthority> 권한목록 = new HashSet<>();
+        SimpleGrantedAuthority 권한 = new SimpleGrantedAuthority("ROLE_oauth2user");
+        권한목록.add(권한);
+        dto.set권한목록(권한목록);
+
+        // 1. DB저장 전에 해당 이메일로 된 이메일이 존재하는지 검사
+        MemberEntity entity =  memberEntityRepository.findByMemail(email);
+        if(entity==null){ // 첫 방문
+            // DB처리 [첫 방문시에만 / 두번째부터는 DB 수정 ]
+            dto.setMrole("oauth2user"); // DB에 저장할 권한명
+            memberEntityRepository.save(dto.toEntity());
+        }else{ // 두번째 방문 이상 수정 처리
+            entity.setMname(name);
+        }
+        return dto;
+    }
+
+
+    // [ 스프링 시큐리티 적용했을때 사용되는 일반 유저 로그인 메소드 ]
     @Override
     public UserDetails loadUserByUsername(String memail) throws UsernameNotFoundException {
         // 1. UserDetailsService 인터페이스 구현
@@ -147,27 +195,65 @@ public class MemberService implements UserDetailsService {
     // 3. 회원 수정
     @Transactional
     public boolean update(MemberDto dto){
+        SecurityContextHolder.getContext().getAuthentication(); // 인증 전체 정보 호출
+        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int mno = ((MemberDto)o).getMno();
+        dto.setMno(mno);
         Optional<MemberEntity> entityOptional = memberEntityRepository.findById((dto.getMno()));
         if(entityOptional.isPresent()){
             MemberEntity entity = entityOptional.get();
             entity.setMname(dto.getMname());
             entity.setMphone(dto.getMphone());
-            entity.setMrole(dto.getMrole());
-            entity.setMpassword(dto.getMpassword());
             return true;
         }
         return false;
     }
     // 4. 회원 탈퇴
     @Transactional
-    public boolean delete(int mno){
+    public boolean delete(String mpassword){
+        SecurityContextHolder.getContext().getAuthentication(); // 인증 전체 정보 호출
+        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int mno = ((MemberDto)o).getMno();
         Optional<MemberEntity> entityOptional = memberEntityRepository.findById(mno);
         if(entityOptional.isPresent()){
-            memberEntityRepository.delete(entityOptional.get());
-            return true;
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            boolean result = passwordEncoder.matches(mpassword,entityOptional.get().getMpassword());
+            if(result){
+                memberEntityRepository.delete(entityOptional.get());
+            }
+            return result;
         }
         return false;
     }
+
+    // 아이디 찾기 이름 전화번호 일치할 경우 아이디 알려주기
+    @Transactional
+    public String findId(MemberDto dto){
+        log.info("dto : " + dto);
+        Optional<MemberEntity> entityOptional = memberEntityRepository.findByMnameAndMphone(dto.getMname(), dto.getMphone());
+        if(entityOptional.isPresent()){
+            log.info(entityOptional.get().getMemail());
+            return entityOptional.get().getMemail();
+        }
+        return null;
+    }
+    // 비밀번호 찾기 아이디와 전화번호 일치할 경우 임시 비민번호 변경 후 알려주기
+    @Transactional
+    public int findPw(MemberDto dto){
+        log.info("dto : " + dto);
+        boolean result = memberEntityRepository.existsByMemailAndMphone(dto.getMemail(), dto.getMphone());
+        if(result){
+            MemberEntity entity = memberEntityRepository.findByMemail(dto.getMemail());
+            Random rand = new Random();
+            int randomNum = rand.nextInt(900000) + 100000;
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            entity.setMpassword(passwordEncoder.encode(String.valueOf(randomNum)));
+            return randomNum;
+        }
+        return 0;
+    }
+    // 회원 정보 수정 이름 전화번호 변경
+    // 회원 탈퇴 [ 비밀번호 재입력 받아 일치할 경우 탈퇴
 
 
 }

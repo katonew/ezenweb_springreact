@@ -48,6 +48,7 @@ function onLogin(){
 
 getMember()
 function getMember(){
+    console.log('getMember 시작')
     $.ajax({
             url : "/member/info",
             method : "get",
@@ -58,13 +59,12 @@ function getMember(){
                 if(!r){
                     html = `<a href="/member/signup"> 회원가입 </a>
                             <a href="/member/login"> 로그인 </a>
-                            <a href="#"> 아이디 찾기 </a>
-                            <a href="#"> 비밀번호 찾기 </a>`
+                            <a href="/member/find"> 아이디/비밀번호 찾기 </a>`
                 }else{
                     html = `${r.mname}님 반갑습니다.
                         <a href="/member/logout">로그아웃</a>
-                        <a href="#">회원정보수정</a>
-                         <a href="#">회원탈퇴</a>
+                        <a href="/member/update">회원정보수정</a>
+                        <button onclick="onDelete()" type="button">회원탈퇴</button>
                     `
                 }
                 document.querySelector('.infobox').innerHTML = html;
@@ -83,3 +83,68 @@ function getLogout(){
     })
 }
 */
+
+// 아이디 찾기
+function findId(){
+     let info = {
+             mname : document.querySelector('.mname').value,
+             mphone : document.querySelector('.mphone').value,
+         }
+         $.ajax({
+             url : "/member/findId",
+             method : "post",
+             contentType : "application/json",
+             data : JSON.stringify(info),
+             success : (r)=>{
+                 console.log(r);
+                 if(r){
+                     document.querySelector('.resultBox').innerHTML = '찾은 아이디 : ' + r;
+                 }else{
+                     document.querySelector('.resultBox').innerHTML = '입력된 정보가 잘못되었습니다.'
+                 }
+             }
+         })
+
+ }
+
+ // 비밀번호 찾기
+ function findPw(){
+     let info = {
+             memail : document.querySelector('.memail').value,
+             mphone : document.querySelector('.mphone2').value,
+         }
+         $.ajax({
+             url : "/member/findPw",
+             method : "post",
+             contentType : "application/json",
+             data : JSON.stringify(info),
+             success : (r)=>{
+                 console.log(r);
+                 if(r){
+                     document.querySelector('.resultBox').innerHTML = '변경된 비밀번호 :'+ r;
+                 }else{
+                     document.querySelector('.resultBox').innerHTML = '입력된 정보가 잘못되었습니다.'
+                 }
+             }
+         })
+
+ }
+
+// 회원탈퇴
+function onDelete(){
+    let mpassword = prompt('비밀번호를 입력해주세요');
+    $.ajax({
+        url : "member/info",
+        method : "delete",
+        data : {"mpassword" : mpassword},
+        success : (r)=>{
+            console.log(r);
+            if(r==true){
+                alert('회원탈퇴 성공');
+                location.href = "/member/logout";
+            }else{
+                alert('회원탈퇴 실패');
+            }
+        }
+    })
+}
