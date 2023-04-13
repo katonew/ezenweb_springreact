@@ -5,6 +5,8 @@ import ezenweb.web.domain.member.MemberEntity;
 import ezenweb.web.domain.member.MemberEntityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +14,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service // 서비스 레이어
 @Slf4j
@@ -27,15 +32,25 @@ public class MemberService implements UserDetailsService {
         // 3. 검증 후 세션에 저장 할 dto 반환
         MemberEntity entity = memberEntityRepository.findByMemail(memail);
         if(entity==null){return null;}
-        log.info("dto :" + entity.toDto());
-        return entity.toDto();
+        MemberDto dto = entity.toDto();
+            // dto 권한(여러개) 넣어주기
+        // 1. 권한 목록 만들기
+        Set<GrantedAuthority> 권한목록 = new HashSet<>();
+        // 2. 권한 객체 만들기 [DB에 존재하는 권한명으로 설정 ]
+        SimpleGrantedAuthority 권한명 = new SimpleGrantedAuthority(entity.getMrole());
+        // 3. 만든 권한 객체를 권한목록[컬렉션] 에 추가
+        권한목록.add(권한명);
+        // 4. UserDetails 에 권한 목록 대입
+        dto.set권한목록(권한목록);
+        log.info("dto :" + dto);
+        return dto; // userDetails : 원본 데이터의 검증할 계정, 패스워드 포함
     }
 
 
     @Autowired
     private MemberEntityRepository memberEntityRepository;
 
-    // 1. 회원가입
+    // 1. 일반 회원가입 [ 본 어플리케이션에서 가입한 회원 ]
     @Transactional
     public boolean write(MemberDto dto){ // 자바 클래스 내 메소드 이름은 중복 불가능
         // 스프링 시큐리티 에서 제공하는 암호화[사람이 이해하기 어렵고 컴퓨터는 이해할 수 있는 단어] 사용하기
@@ -45,8 +60,10 @@ public class MemberService implements UserDetailsService {
         log.info("비크립트 암호화 사용 :  " + passwordEncoder.encode("1234"));
         // 입력받은 비밀번호를 암호화 한 후에 다시 dto에 저장
         dto.setMpassword((passwordEncoder.encode(dto.getMpassword())));
+        // 일반 회원에는 user 라는 등급 부여
+        dto.setMrole("user");
         log.info(dto.getMpassword());
-        
+        // dto를 entity로 변환 후 repository로 등록
         MemberEntity entity = memberEntityRepository.save(dto.toEntity());
         if(entity.getMno()>0){return true;}
         return false;

@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Set;
 
 
 // 시큐리티[UserDetails] + 일반 dto
@@ -16,12 +17,15 @@ import java.util.Collection;
 @Builder
 public class MemberDto implements UserDetails {
 
-    private int mno;            // 1. 회원번호
-    private String memail;      // 2. 회원 아이디 [ 이메일 ]
-    private String mpassword;   // 3. 회원 비밀번호
-    private String mname;       // 4. 회원이름
-    private String mphone;      // 5. 회원전화번호
-    private String mrole;       // 6. 회원등급
+    private int mno;                    // 1. 회원번호
+    private String memail;              // 2. 회원 아이디 [ 이메일 ]
+    private String mpassword;           // 3. 회원 비밀번호
+    private String mname;               // 4. 회원이름
+    private String mphone;              // 5. 회원전화번호
+    private String mrole;               // 6. 회원등급 [ 가입용 ]
+    private Set<GrantedAuthority> 권한목록;     // 7. 회원등급 [ 인증용]
+    
+    // 추가
     private LocalDateTime cdate;
     private LocalDateTime udate;
     //toEntity
@@ -38,7 +42,7 @@ public class MemberDto implements UserDetails {
 
     @Override // 인증 된 권한 반환
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return 권한목록;
     }
 
     @Override // 패스워드 반환
