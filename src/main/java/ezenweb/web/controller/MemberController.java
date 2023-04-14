@@ -29,7 +29,7 @@ public class MemberController {
 
     // 1. 회원가입[C]
     @PostMapping("/info")   // URL 같아도 HTTP 메소드 다르므로 식별 가능
-    public boolean write(@RequestBody MemberDto dto){ // 자바 클래스 내 메소드 이름은 중복 불가능
+    public int write(@RequestBody MemberDto dto){ // 자바 클래스 내 메소드 이름은 중복 불가능
         log.info("member info write : " + dto);
         return memberService.write(dto);
     }

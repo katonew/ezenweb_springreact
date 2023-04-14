@@ -15,9 +15,14 @@ function onSignup(){
         data : JSON.stringify(info),
         success : (r)=>{
             console.log(r);
-            if(r==true){
+            if(r==1){
                 alert('회원가입 성공');
                 location.href = "/";
+            }else if(r==2){
+                alert('회원가입 실패');
+            }else if(r==3){
+                alert('이미 가입된 아이디입니다.');
+                location.href = href="/member/login"
             }
         }
     })
@@ -64,7 +69,7 @@ function getMember(){
                     html = `${r.mname}님 반갑습니다.
                         <a href="/member/logout">로그아웃</a>
                         <a href="/member/update">회원정보수정</a>
-                        <button onclick="onDelete()" type="button">회원탈퇴</button>
+                        <a onclick="onDelete()">회원탈퇴</a>
                     `
                 }
                 document.querySelector('.infobox').innerHTML = html;

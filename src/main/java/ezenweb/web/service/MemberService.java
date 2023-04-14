@@ -41,20 +41,36 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         // 2. 전달받은 정보 객체
         // !!!! oauth 로그인한 유저의 정보  => oAuth2User.getAttributes()
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
-
-        // 3. 클라이언트id 요청 [ 구글인지 네이버인지 카카오인지 ]
+            log.info(("회원 정보 : " + oAuth2User.getAttributes()));
+            
+        // 3. 클라이언트id 식별 [ 구글인지 네이버인지 카카오인지 ]
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        log.info("클라이언트 ID : " + registrationId);
+        String email = null;
+        String name = null;
+        if(registrationId.equals("kakao")){ // 만약 카카오 회원이면
+            Map<String,Object> kakao_account = (Map<String,Object>) oAuth2User.getAttributes().get("kakao_account");
+            Map<String,Object> profile = (Map<String,Object>) kakao_account.get("profile");
+            email = (String)kakao_account.get("email");
+            name = (String)profile.get("nickname");
+            log.info("email : " + email);
+            log.info("name : " + name);
+            log.info("kakao_account : " + kakao_account);
+        }else if (registrationId.equals("naver")) { // 만약에 네이버 회원이면
+            Map<String , Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("response");
+            email = (String)response.get("email");
+            name = (String)response.get("nickname");
+        }else if (registrationId.equals("google")) { // 만약에 구글 회원이면
+            email = (String)oAuth2User.getAttributes().get("email");          // 구글의 이메일 호출
+            name = (String)oAuth2User.getAttributes().get("name");            // 구글의 이름 호출
+        }
         // 인가 객체 [ Oauth2User --->MemberDto 통합DTO(일반+oauth2)]
         MemberDto dto = new MemberDto();
-
-            // 구글의 이메일 호출
-        String email = (String)oAuth2User.getAttributes().get("email");
-            // 구글의 이름 호출
-        String name = (String)oAuth2User.getAttributes().get("name");
+        dto.set소셜회원정보(oAuth2User.getAttributes());
         dto.setMemail(email);
         dto.setMname(name);
         Set<GrantedAuthority> 권한목록 = new HashSet<>();
-        SimpleGrantedAuthority 권한 = new SimpleGrantedAuthority("ROLE_oauth2user");
+        SimpleGrantedAuthority 권한 = new SimpleGrantedAuthority("ROLE_user");
         권한목록.add(권한);
         dto.set권한목록(권한목록);
 
@@ -101,7 +117,10 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
 
     // 1. 일반 회원가입 [ 본 어플리케이션에서 가입한 회원 ]
     @Transactional
-    public boolean write(MemberDto dto){ // 자바 클래스 내 메소드 이름은 중복 불가능
+    public int write(MemberDto dto){ // 자바 클래스 내 메소드 이름은 중복 불가능
+        // 아이디 중복체크
+        MemberEntity checkEntity = memberEntityRepository.findByMemail(dto.getMemail());
+        if(checkEntity!=null){return 3;}
         // 스프링 시큐리티 에서 제공하는 암호화[사람이 이해하기 어렵고 컴퓨터는 이해할 수 있는 단어] 사용하기
             // DB 내에서 패스워드 감추기 , 정보가 이동하면서 패드워드 노출 방지
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -114,8 +133,8 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         log.info(dto.getMpassword());
         // dto를 entity로 변환 후 repository로 등록
         MemberEntity entity = memberEntityRepository.save(dto.toEntity());
-        if(entity.getMno()>0){return true;}
-        return false;
+        if(entity.getMno()>0){return 1;}
+        return 2;
     }
 
     // ****로그인 [ 시큐리티 사용 시 ]
