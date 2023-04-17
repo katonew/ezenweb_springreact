@@ -48,18 +48,10 @@ public class BoardService {
         // 1. 선택된 카테고리 번호를 이용한 카테고리 엔티티 찾기
         Optional<CategoryEntity> categoryEntityOptional =
                 categoryEntityRepository.findById(boarddto.getCno());
-        // 2.만약에 선택된 카테고리가 존재하지 않으면 리턴
-        if(!categoryEntityOptional.isPresent()){return false;}
-        // 3. 카테고리 엔티티 추출
-        CategoryEntity categoryEntity = categoryEntityOptional.get();
+        if(!categoryEntityOptional.isPresent()){return false;} // 만약에 선택된 카테고리가 존재하지 않으면 리턴
+        CategoryEntity categoryEntity = categoryEntityOptional.get();  // 카테고리 엔티티 추출
 
-        // 4. 게시물 쓰기
-        BoardEntity boardEntity =
-        boardEntityRepository.save(boarddto.toBoardEntity());
-        if(boardEntity.getBno()<1){return false;}
-
-
-        // 5. 로그인 된 회원의 엔티티 찾기
+        // 2. 로그인 된 회원의 엔티티 찾기
             // 1. 인증 된 회원 찾기
         Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(o.equals("anonymousUser")){
@@ -71,13 +63,21 @@ public class BoardService {
         MemberEntity memberEntity = memberEntityRepository.findByMemail(memberDto.getMemail());
 
 
-        // 6. 양방향 관계 (게시글<-->카테고리)
+        // 3. 게시물 쓰기
+        BoardEntity boardEntity =
+        boardEntityRepository.save(boarddto.toBoardEntity());
+        if(boardEntity.getBno()<1){return false;}
+
+
+
+
+        // 4.. 양방향 관계 (게시글<-->카테고리)
             // 1. 카테고리 엔티티에 생성된 게시물 등록
         categoryEntity.getBoardEntityList().add(boardEntity);
             // 2. 생성된 게시글에 카테고리 엔티티 등록
         boardEntity.setCategoryEntity(categoryEntity);
 
-        // 7. 양방향 관계 (게시글<-->멤버)
+        // 4. 양방향 관계 (게시글<-->멤버)
             // 1. 생성된 게시글 엔티티에 로그인 된 회원 등록
         boardEntity.setMemberEntity(memberEntity);
             // 2. 생성된 게시글에 카테고리 엔티티 등록
