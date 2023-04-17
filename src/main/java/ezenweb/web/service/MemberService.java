@@ -95,7 +95,7 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
             // 패스워드 검증 [ 시큐리티 자동 ]
         // 3. 검증 후 세션에 저장 할 dto 반환
         MemberEntity entity = memberEntityRepository.findByMemail(memail);
-        if(entity==null){return null;}
+        if(entity==null){throw new UsernameNotFoundException("해당 계정이 없습니다");}
         MemberDto dto = entity.toDto();
             // dto 권한(여러개) 넣어주기
         // 1. 권한 목록 만들기

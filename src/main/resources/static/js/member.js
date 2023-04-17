@@ -1,5 +1,5 @@
 console.log('member js 시작')
-
+// 1. 회원가입
 function onSignup(){
     let info = {
         memail : document.querySelector('.memail').value,
@@ -27,6 +27,26 @@ function onSignup(){
         }
     })
 }
+
+// 2. 로그인
+function onlogin(){
+    let loginForm = document.querySelectorAll('.loginForm')[0];
+    let loginFormData = new FormData(loginForm);
+    $.ajax({ // 폼전송
+        url : "/member/login",
+        method : "post",
+        contentType : false,
+        processData : false,
+        data : loginFormData,
+        success : (r)=>{
+            console.log(r);
+        }
+    })
+}
+
+
+
+
 /*
 시큐리티 사용으로 폼전송으로 로그인
 function onLogin(){
@@ -51,6 +71,7 @@ function onLogin(){
 }
 */
 
+// 3. 로그인 정보 요청
 getMember()
 function getMember(){
     console.log('getMember 시작')
@@ -77,6 +98,7 @@ function getMember(){
         })
 }
 
+// 4. 로그아웃
 /*
 function getLogout(){
     $.ajax({
