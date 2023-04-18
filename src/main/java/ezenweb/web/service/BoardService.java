@@ -8,13 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -43,19 +39,19 @@ public class BoardService {
 
     @Transactional
     // 2. 게시글 쓰기
-    public boolean boardWrite(BoardDto boarddto) {
+    public byte boardWrite(BoardDto boarddto) {
         log.info("s boardWrite boarddto : " + boarddto);
         // 1. 선택된 카테고리 번호를 이용한 카테고리 엔티티 찾기
         Optional<CategoryEntity> categoryEntityOptional =
                 categoryEntityRepository.findById(boarddto.getCno());
-        if(!categoryEntityOptional.isPresent()){return false;} // 만약에 선택된 카테고리가 존재하지 않으면 리턴
+        if(!categoryEntityOptional.isPresent()){return 1;} // 만약에 선택된 카테고리가 존재하지 않으면 리턴
         CategoryEntity categoryEntity = categoryEntityOptional.get();  // 카테고리 엔티티 추출
 
         // 2. 로그인 된 회원의 엔티티 찾기
             // 1. 인증 된 회원 찾기
         Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(o.equals("anonymousUser")){
-            return false;
+            return 2;
         }
             // 2. 형변환
         MemberDto memberDto = (MemberDto)o;
@@ -63,10 +59,10 @@ public class BoardService {
         MemberEntity memberEntity = memberEntityRepository.findByMemail(memberDto.getMemail());
 
 
-        // 3. 게시물 쓰기
+        // 3. 게시물 DB 등록
         BoardEntity boardEntity =
         boardEntityRepository.save(boarddto.toBoardEntity());
-        if(boardEntity.getBno()<1){return false;}
+        if(boardEntity.getBno()<1){return 3;}
 
 
 
@@ -83,18 +79,74 @@ public class BoardService {
             // 2. 생성된 게시글에 카테고리 엔티티 등록
         memberEntity.getBoardEntityList().add(boardEntity);
 
+        // 공지사항 게시물 정보 확인
+        //Optional<CategoryEntity> optionalCategory = categoryEntityRepository.findById(1);
+        //log.info("공지사항 정보 확인 : " + optionalCategory.get());
+
         // 확인
         log.info("board entity : " + boardEntity.toString());
 
 
-        return true;
+        return 4;
     }
     // 3. 내가 쓴 게시물 출력
     public List<BoardDto> myboards() {
-        return null;
+        List<BoardDto> list = new ArrayList<>();
+        // 1. 로그인 인증 세션 Object--> dto 강제형변환
+        MemberDto memberDto = (MemberDto)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // 2. 회원 엔티티 찾아 엔티티 안의 board entity 리스트로 담아 반환
+        memberEntityRepository.findByMemail(memberDto.getMemail()).getBoardEntityList().forEach((e)->{
+            list.add(e.toDto());
+        });
+        return list;
     }
-    // 2. 게시글 쓰기
 
-    // 3. 내가 쓴 게시글 출력
+    // 카테고리 출력
+    public Map<Integer,String> getCategoryList(){
+        Map<Integer,String> categoryList = new HashMap<>();
+        List<CategoryEntity> categoryEntityList
+               = categoryEntityRepository.findAll();
+        // 형변환 LIST<엔티티> ---> MAP
+        categoryEntityList.forEach((e)->{
+            categoryList.put(e.getCno(),e.getCname());
+        });
+        return categoryList;
+    }
+    
+    // 4. 카테고리 별 게시물 출력
+    public List<BoardDto> list( int cno) {
+        log.info("c list cno : " + cno);
+        List<BoardDto> list = new ArrayList<>();
+        List<BoardEntity> boardEntityList;
+        if(cno==0){
+            boardEntityList = boardEntityRepository.findAll(); // 모든 카테고리의 게시글 출력
+            boardEntityList.forEach((e)->{
+                list.add(e.toDto());
+            });
+        }else{
+            Optional<CategoryEntity> categoryEntityOptional = categoryEntityRepository.findById(cno); //해당 카테고리의 게시글 출력
+            if(categoryEntityOptional.isPresent()){
+                boardEntityList = categoryEntityOptional.get().getBoardEntityList();
+                boardEntityList.forEach((e)->{
+                    list.add(e.toDto());
+                });
+            } // if e
+        } // else e
+        return list;
+    }
+
+    // 게시물 상세 출력
+    public BoardDto info(int bno) {
+        return boardEntityRepository.findById(bno).get().toDto();
+    }
+
+    // 게시글 삭제
+    public boolean bdelete(int bno) {
+        BoardEntity boardEntity = boardEntityRepository.findById(bno).get();
+        boardEntityRepository.delete(boardEntity);
+        return true;
+    }
+
+
 
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import java.sql.Date;
 
 @Data@AllArgsConstructor@NoArgsConstructor@Builder
 public class BoardDto {
@@ -15,6 +16,15 @@ public class BoardDto {
     private String bcontent;
     private int cno;
     private String cname;
+
+    // 추가
+    private int mno;
+    private String mname;
+    private String bdate; // 작성일
+    private int bview; // 조회수
+
+    // 댓글 목록
+
 
     // 엔티티 변환 메소드
     // 1. toCategoryEntity
