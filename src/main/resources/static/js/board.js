@@ -133,7 +133,7 @@ function myboards(){
         }
     })
 }
-
+// 선택한 게시물의 정보 가져오기
 function getboardinfo(bno){
     $.ajax({
         url : "/board/info",
@@ -156,6 +156,8 @@ function getboardinfo(bno){
         }
     })
 }
+
+// 선택한 게시물의 작성자 정보 가져오기
 function getminfo(){
     let memberinfo;
     $.ajax({
