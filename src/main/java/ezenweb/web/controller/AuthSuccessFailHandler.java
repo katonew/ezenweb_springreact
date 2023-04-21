@@ -7,6 +7,7 @@ package ezenweb.web.controller;
 //AuthenticationFailureHandler : 인증 실패했을때에 대한 인터페이스
 // onAuthenticationFailure : 인증이 실패했을때 실행되는 메소드
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ezenweb.web.domain.member.MemberDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -29,7 +30,8 @@ public class AuthSuccessFailHandler implements AuthenticationSuccessHandler , Au
     @Override // 인수 : request, response, authentication : 인증 성공한 정보
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("authentication : " + authentication.toString());
-        String json = objectMapper.writeValueAsString("로그인 성공");
+        MemberDto dto = (MemberDto)authentication.getPrincipal(); // 로그인 성공한 객체
+        String json = objectMapper.writeValueAsString(dto);
 
         // ajax에게 전송
         response.setCharacterEncoding("UTF-8");
@@ -41,7 +43,7 @@ public class AuthSuccessFailHandler implements AuthenticationSuccessHandler , Au
     @Override // 인수 : request, response, exception : 예외 [ 인증 실패한 예외 객체 ]
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         log.info("exception : " + exception.toString());
-        String json = objectMapper.writeValueAsString("로그인 실패");
+        String json = objectMapper.writeValueAsString(false);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         response.getWriter().println(json);

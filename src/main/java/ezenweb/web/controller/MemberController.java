@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController // Controller+Responsebody
 @Slf4j // 로그가능
 @RequestMapping("/member")
+@CrossOrigin(origins = {"http://localhost:3000","http://192.168.17.54:3000"})
 public class MemberController {
     @GetMapping("/signup")
     public Resource getSignup(){return new ClassPathResource("templates/member/signup.html");}
