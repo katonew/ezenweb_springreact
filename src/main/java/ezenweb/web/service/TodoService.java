@@ -3,8 +3,13 @@ package ezenweb.web.service;
 import ezenweb.web.domain.todo.TodoDto;
 import ezenweb.web.domain.todo.TodoEntity;
 import ezenweb.web.domain.todo.TodoEntityRepository;
+import ezenweb.web.domain.todo.TodoPageDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,15 +25,19 @@ public class TodoService {
     private TodoEntityRepository todoEntityRepository;
 
     @Transactional
-    public List<TodoDto> get(){
-        List<TodoDto> result = new ArrayList<>();
-        List<TodoEntity> entityList = todoEntityRepository.findAll();
+    public TodoPageDto get(int page){
+        List<TodoDto> todoDtoList = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page-1, 3, Sort.by(Sort.Direction.DESC, "id"));
+        Page<TodoEntity> entityList = todoEntityRepository.findAll(pageable);
         for( TodoEntity e : entityList){
-            result.add(e.toDto());
+            todoDtoList.add(e.toDto());
         }
-        // 서비스 구현 후 리턴결과 axios에게 응답
-        log.info("get result : " + result);
-        return result;
+        return TodoPageDto.builder()
+                .todoDtoList(todoDtoList)
+                .totalCount(entityList.getTotalElements())
+                .totalPage(entityList.getTotalPages())
+                .page(page)
+                .build();
     }
     @Transactional
     public boolean post(@RequestBody TodoDto todoDto){

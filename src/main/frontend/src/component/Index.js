@@ -9,6 +9,7 @@ import Find from "./member/Find"
 import List from "./board/List"
 import DashBoard from "./admin/DashBoard"
 import Write from "./board/Write"
+import AppTodo from "../example/exbook/AppTodo"
 
 
 /*
@@ -32,6 +33,7 @@ export default function Index(props){
                 <Route path="/board/list" element = { <List/> } />
                 <Route path="/admin/dashboard" element = { <DashBoard/> } />
                 <Route path="/board/write" element = { <Write/> } />
+                <Route path="/AppTodo" element = { <AppTodo/> } />
             </Routes>
             <Footer />
         </BrowserRouter>
