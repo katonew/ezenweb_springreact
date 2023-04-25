@@ -274,5 +274,10 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
     // 회원 정보 수정 이름 전화번호 변경
     // 회원 탈퇴 [ 비밀번호 재입력 받아 일치할 경우 탈퇴
 
+    // 5. 아이디 중복 확인
+    public boolean idcheck( String memail ){
+        return memberEntityRepository.existsByMemail( memail  );
+    }
+
 
 }

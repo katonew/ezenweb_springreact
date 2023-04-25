@@ -1,6 +1,8 @@
 package ezenweb.web.controller;
 
 import ezenweb.web.domain.board.BoardDto;
+import ezenweb.web.domain.board.CategoryDto;
+import ezenweb.web.domain.board.PageDto;
 import ezenweb.web.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("/board")
+//@CrossOrigin( origins = "http://localhost:3000")
 public class BoardController {
 
     // 서비스 객체들
@@ -22,12 +25,12 @@ public class BoardController {
     private BoardService boardService;
     //--------------view 반환 ---------------//
 
-    @GetMapping("")
+    /*@GetMapping("")
     public Resource list(){
         return new ClassPathResource("templates/board/list.html");
     }
     //--------------Model 반환---------------//
-
+    */
     // 1. 카테고리 등록
     @PostMapping("/category/write")
     public boolean categoryWrite(@RequestBody BoardDto boarddto) {
@@ -36,12 +39,12 @@ public class BoardController {
     }
     // 4. 카테고리 출력 [ (DTO가 없을 경우) 반환타입 : 1. List 2. Map ]
     @GetMapping("/category/list")
-    public Map<Integer,String> getCategoryList() {
-        log.info("c getCategoryList");
-        return boardService.getCategoryList();
+    public List<CategoryDto> categoryList(  ){  log.info("c categoryList : " );
+        List<CategoryDto> result = boardService.categoryList(  );
+        return result;
     }
     // 2. 게시글 쓰기
-    @PostMapping("/write")
+    @PostMapping("")
     public byte boardWrite(@RequestBody BoardDto boarddto) {
         log.info("c boardWrite boarddto : " + boarddto);
         return boardService.boardWrite(boarddto);
@@ -53,19 +56,19 @@ public class BoardController {
     }
 
     // 게시물 출력
-    @GetMapping("/list")
-    public List<BoardDto> list(@RequestParam int cno) {
-        log.info("c list cno : " + cno);
-        return boardService.list(cno);
+    @GetMapping("")
+    public PageDto list(@RequestParam int cno, @RequestParam int page) {
+        log.info("c list cno : " + cno + " page : " + page );
+        return boardService.list(cno,page);
     }
     // 게시물 상세 출력
-    @GetMapping("/info")
+    @GetMapping("/getboard")
     public BoardDto info(@RequestParam int bno) {
         return boardService.info(bno);
     }
 
     // 게시글 삭제
-    @DeleteMapping("/delete")
+    @DeleteMapping("")
     public boolean bdelete(@RequestParam int bno) {
 
         return boardService.bdelete(bno);

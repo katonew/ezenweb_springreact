@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController // Controller+Responsebody
 @Slf4j // 로그가능
 @RequestMapping("/member")
-@CrossOrigin(origins = {"http://localhost:3000","http://192.168.17.54:3000"})
+//@CrossOrigin(origins = {"http://localhost:3000","http://192.168.17.54:3000"})
 public class MemberController {
-    @GetMapping("/signup")
+    /*@GetMapping("/signup")
     public Resource getSignup(){return new ClassPathResource("templates/member/signup.html");}
     @GetMapping("/login")
     public Resource getLogin(){return new ClassPathResource("templates/member/login.html");}
@@ -21,7 +21,7 @@ public class MemberController {
     public Resource getFindId(){return new ClassPathResource("templates/member/findId.html");}
     @GetMapping("/update")
     public Resource getUpdate(){return new ClassPathResource("templates/member/update.html");}
-
+    */
     // @Autowired 없이 객체[빈] 자동 생성
     // MemberService service = new MemberService();
     // @Autowired 사용할 때 객체[빈] 자동 생성
@@ -63,6 +63,12 @@ public class MemberController {
     public int findPw(@RequestBody MemberDto dto){
         log.info("findPw dto : " + dto);
         return memberService.findPw(dto);
+    }
+
+    // 5. [G] 아이디 중복체크
+    @GetMapping("/idcheck")
+    public boolean idcheck( @RequestParam String memail ){log.info(" idcheck memail : " + memail );
+        return memberService.idcheck( memail );
     }
 
 

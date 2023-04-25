@@ -37,39 +37,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // super.configure(http); super : 부모 클래스 호출
         http
-                // 권한에 따른 HTTP GET 요청 제한
-                .authorizeRequests() // HTTP 인증 요청
-                    .antMatchers("/member/info/mypage") // 인증 시에만 사용할 URL
-                        .hasRole("user")    // 위 URL 패턴에 요청 할 수 있는 권한 명
-                    .antMatchers(("/admin/**")) //localhost:8080/admin 이하 페이지는 모두 제한
-                        .hasRole("admin")
-                    .antMatchers(("/board/**"))// 글쓰기 페이지는 회원만 가능
-                        .hasRole(("user"))
-                    .antMatchers(("/**")) // localhost:8080 이하 페이지는 권한 해제
-                        .permitAll() // 권한 해제
-                    // 토큰에는 ROLE_USER이지만 앞의 ROLE은 생략
-                .and()
-                    .csrf() // 사이트 간 요청 위조 [ POST , PUT 은 HTTP 사용 불가능 ]
-                        //.disable() // 모든 HTTP에 csrf 해제
-                        // 특정 HTTP URL에만 해제
-                        .ignoringAntMatchers("/member/info")        // 특정 매핑URL 은 CSRF 무시
-                        .ignoringAntMatchers("/member/login")
-                        .ignoringAntMatchers("/member/findId")
-                        .ignoringAntMatchers("/member/findPw")
-                        .ignoringAntMatchers("/board/write")
-                        .ignoringAntMatchers("/board/delete")
-                        .ignoringAntMatchers("/board/category/write")
-                        .ignoringAntMatchers("/todo")
-                .and() // 기능 추가 할 때 사용되는 메소드
-                    .formLogin()
-                        .loginPage("/member/login")             // 로그인 페이지로 사용할 매핑 URL
-                        .loginProcessingUrl("/member/login")    // 로그인 처리할 매핑 URL
-                        //.defaultSuccessUrl("/")                 // 로그인 성공 시 매핑될 URL
-                        .successHandler(authSuccessFailHandler)
-                        //.failureForwardUrl("/member/login")     // 로그인 실패했을 때 이동 할 매핑  URL
-                        .failureHandler(authSuccessFailHandler)
-                        .usernameParameter("memail")            // 로그인 시 사용될 계정 아이디의 필드명
-                        .passwordParameter("mpassword")         // 로그인 시 사용될 계정 비밀번호의 필드명
+                .formLogin()
+                    .loginPage("/member/login")             // 로그인 페이지로 사용할 매핑 URL
+                    .loginProcessingUrl("/member/login")    // 로그인 처리할 매핑 URL
+                    //.defaultSuccessUrl("/")                 // 로그인 성공 시 매핑될 URL
+                    .successHandler(authSuccessFailHandler)
+                    //.failureForwardUrl("/member/login")     // 로그인 실패했을 때 이동 할 매핑  URL
+                    .failureHandler(authSuccessFailHandler)
+                    .usernameParameter("memail")            // 로그인 시 사용될 계정 아이디의 필드명
+                    .passwordParameter("mpassword")         // 로그인 시 사용될 계정 비밀번호의 필드명
                 .and()
                     .logout()
                         .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout"))     // 로그아웃 처리할 매핑 URL
@@ -77,17 +53,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         .invalidateHttpSession(true)                                                  // 세션 초기화
                 .and()
                     .oauth2Login() // 소셜 로그인 설정
-                        //.defaultSuccessUrl("/") // 로그인 성공시 URL
-                        .successHandler(authSuccessFailHandler)
+                        .defaultSuccessUrl("/") // 로그인 성공시 URL
+                        //.successHandler(authSuccessFailHandler)
                         .userInfoEndpoint()
                         .userService(memberService); // oauth2  서비스를 처리할 서비스 구현
 
         http.cors(); // cors 정책 사용 선언
-
+        http.csrf().disable(); // csrf 사용해제
 
     } // configure e
 
-    // 스프링 시큐리티에 CORS 정책 설정 [ 리액트[3000]의 요청 받기 위해서 ]
+    /*// 스프링 시큐리티에 CORS 정책 설정 [ 리액트[3000]의 요청 받기 위해서 ]
     @Bean // 빈등록
     CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -98,5 +74,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**",corsConfiguration);
         return source;
-    }
+    }*/
 } // class e

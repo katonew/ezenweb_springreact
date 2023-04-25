@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class IndexController {
 
-    @GetMapping("/")  //localhost:8080 요청 시 아래 템플릿 [ html ] 반환
+    /*@GetMapping("/")  //localhost:8080 요청 시 아래 템플릿 [ html ] 반환
     public Resource getIndex() {
         return new ClassPathResource("templates/index.html");
-    }
+    }*/
 
 }

@@ -14,12 +14,12 @@ export default function Signup(props) {
         }
         console.log(info)
         // ajax -> axios
-        axios.post("http://localhost:8080/member/info" , info)
+        axios.post("/member/info" , info)
             .then( r =>{
                 console.log(r);
                 if(r.data==1){
                     alert('회원가입 성공');
-                    window.location.href = "/login";
+                    window.location.href = "/member/login";
                 }else if(r.data==2){
                     alert('회원가입 실패');
                 }else if(r.data==3){
@@ -29,11 +29,22 @@ export default function Signup(props) {
             })
             .catch(err=>{console.log(err)});
     }
-
+    // 2. 아이디 중복체크
+    let [ memailMsg , setMemailMsg ] = useState('');
+    const idCheck = (e) => {  // 1. console.log( document.querySelector('.memail').value ) ;  // 2. console.log( e.target.value ) ;
+        axios.get( "/member/idcheck" , { params : { memail : e.target.value } } )
+            .then( res => {
+                if( res.data == true ){ setMemailMsg('사용중인 이메일 입니다.')}
+                else{ setMemailMsg('사용 가능 한 이메일 입니다. ')}
+                }
+            )  .catch( e => console.log( e ) )
+    }
     return (<>
             <h3>회원가입 페이지</h3>
             <div>
-                아이디[이메일] : <input type="text" className="memail" /> <br/>
+                아이디[이메일] : <input type="text" className="memail" onChange={ idCheck } />
+                                    <span> { memailMsg } </span>
+                                    <br/>
                 비밀번호 : <input type="password" className="mpassword" /> <br/>
                 이름 : <input type="text" className="mname" /> <br/>
                 전화번호 : <input type="text" className="mphone" /> <br/>

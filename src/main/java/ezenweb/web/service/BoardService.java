@@ -6,6 +6,10 @@ import ezenweb.web.domain.member.MemberEntity;
 import ezenweb.web.domain.member.MemberEntityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -85,8 +89,6 @@ public class BoardService {
 
         // 확인
         log.info("board entity : " + boardEntity.toString());
-
-
         return 4;
     }
     // 3. 내가 쓴 게시물 출력
@@ -102,45 +104,51 @@ public class BoardService {
     }
 
     // 카테고리 출력
-    public Map<Integer,String> getCategoryList(){
-        Map<Integer,String> categoryList = new HashMap<>();
-        List<CategoryEntity> categoryEntityList
-               = categoryEntityRepository.findAll();
-        // 형변환 LIST<엔티티> ---> MAP
-        categoryEntityList.forEach((e)->{
-            categoryList.put(e.getCno(),e.getCname());
+    @Transactional
+    public List<CategoryDto> categoryList(  ){    log.info("s categoryList : " );
+        List<CategoryEntity> categoryEntityList = categoryEntityRepository.findAll();
+
+        List<CategoryDto> list = new ArrayList<>();
+        categoryEntityList.forEach( (e)->{
+            list.add( new CategoryDto( e.getCno() , e.getCname()) );
         });
-        return categoryList;
+        return list;
     }
     
     // 4. 카테고리 별 게시물 출력
-    public List<BoardDto> list( int cno) {
-        log.info("c list cno : " + cno);
-        List<BoardDto> list = new ArrayList<>();
-        List<BoardEntity> boardEntityList;
-        if(cno==0){
-            boardEntityList = boardEntityRepository.findAll(); // 모든 카테고리의 게시글 출력
-            boardEntityList.forEach((e)->{
-                list.add(e.toDto());
-            });
-        }else{
-            Optional<CategoryEntity> categoryEntityOptional = categoryEntityRepository.findById(cno); //해당 카테고리의 게시글 출력
-            if(categoryEntityOptional.isPresent()){
-                boardEntityList = categoryEntityOptional.get().getBoardEntityList();
-                boardEntityList.forEach((e)->{
-                    list.add(e.toDto());
-                });
-            } // if e
-        } // else e
-        return list;
+    @Transactional
+    public PageDto list( int cno, int page) {
+        log.info("c list cno : " + cno + "page : " + page);
+        // 1. pageable 인터페이스 [페이징처리 관련 api]
+        // Pageable import domain
+        Pageable pageable = PageRequest.of(page-1, 5, Sort.by(Sort.Direction.DESC, "bno"));
+                // PageRequest.of(페이지번호[0부터시작], 페이지당 표시개수, 정렬방식[Sort.by])
+                    // Sort.by(Sort.Direction.ACS,DESC, ' 정렬기준필드명')
+        Page<BoardEntity> entityPage = boardEntityRepository.findBySearch(cno,pageable);
+        //
+        List<BoardDto> boardDtoList = new ArrayList<>();
+        entityPage.forEach( (b)->{
+            boardDtoList.add(b.toDto());
+        });
+        log.info("총 게시물 수 : " + entityPage.getTotalElements());
+        log.info("총 페이지 수 : " + entityPage.getTotalPages());
+        return PageDto.builder()
+                .boardDtoList(boardDtoList)
+                .totalCount(entityPage.getTotalElements())
+                .totalPage(entityPage.getTotalPages())
+                .cno(cno)
+                .page(page)
+                .build();
     }
 
     // 게시물 상세 출력
+    @Transactional
     public BoardDto info(int bno) {
         return boardEntityRepository.findById(bno).get().toDto();
     }
 
     // 게시글 삭제
+    @Transactional
     public boolean bdelete(int bno) {
         BoardEntity boardEntity = boardEntityRepository.findById(bno).get();
         boardEntityRepository.delete(boardEntity);

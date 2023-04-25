@@ -13,8 +13,8 @@ function setCategory() {
         success : (r)=>{
             console.log(r);
             if(r==true){
-                getCategory();
                 document.querySelector('.cname').value = '';
+                getCategory();
             } // if e
         } // success e
     }) // ajax e
