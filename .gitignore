@@ -2,3 +2,5 @@
 /.gradle/
 /build/
 /build/classes/java/main/
+### 직접 추가한 제외 폴더
+/.idea/
