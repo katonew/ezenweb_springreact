@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <div>
+        <a href="/"> 홈으로</a>
+        <h3>아이디 찾기</h3>
+        <form >
+          이름 : <input type="text" class="mname"> </br>
+          전화번호 : <input type="text" class="mphone"> </br>
+          <button onclick="findId()" type="button">아이디 찾기</button>
+        </form>
+        <h3>비밀번호 찾기</h3>
+        <form >
+            아이디[이메일] : <input type="text" class="memail"> </br>
+            전화번호 : <input type="text" class="mphone2"> </br>
+            <button onclick="findPw()" type="button">비밀번호 찾기</button>
+        </form>
+        <div class="resultBox"></div>
+    </div>
+
+
+
+
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="/js/member.js" type="text/javascript"></script>
+</body>
+</html>
