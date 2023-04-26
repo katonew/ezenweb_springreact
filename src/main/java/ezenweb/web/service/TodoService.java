@@ -27,7 +27,7 @@ public class TodoService {
     @Transactional
     public TodoPageDto get(int page){
         List<TodoDto> todoDtoList = new ArrayList<>();
-        Pageable pageable = PageRequest.of(page-1, 3, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page-1, 5, Sort.by(Sort.Direction.DESC, "id"));
         Page<TodoEntity> entityList = todoEntityRepository.findAll(pageable);
         for( TodoEntity e : entityList){
             todoDtoList.add(e.toDto());

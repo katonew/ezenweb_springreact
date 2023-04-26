@@ -15,26 +15,33 @@ export default function AppTodo(props) {
     let [ totalCount , setTotalCount ] = useState(1);
 
     // 2. items에 새 item을 등록하는 함수
-    const addItem = (item) =>{
-        setItems([...items, item ] ); // 기존 상태 items에 item 추가
-        // setItems([...기본배열, 추가할 데이터 ])
-        axios.post("/todo", { title : item.title }).then(r=>{console.log(r)});
+   const addItem = (item) => {
+       axios.post("/todo", { title : item.title }).then(r => {
+           console.log(r);
+           setPage(1);
+           selectPage(null, 1);
+           print();
+       });
+   }
+
+    function print(){
+        axios.get("/todo/getTodo" , { params : {page : page} })
+            .then(r=>{
+                    console.log(r)
+                    setItems(r.data.todoDtoList);
+                    setTotalCount(r.data.totalCount)
+                    setTotalPage(r.data.totalPage)
+                }
+            );
+        console.log(setItems);
     }
 
-    // 컴포넌트가 실행 될 때 한번 이벤트 발생
+    // page가 변환 될 때 이벤트 발생
     useEffect( ()=>{
         // ajax : jquery 설치가 필요
         // fetch : 리액트 전송 비동기 통신 함수 [ 리액트 내장 / 설치 X ]
         // axios : 리액트 외부 라이브러리 [ 설치 필요 ] ==> JSON 통신 기본값.
-        axios.get("/todo/getTodo" , { params : {page : page} })
-                .then(r=>{
-                        console.log(r)
-                        setItems(r.data.todoDtoList);
-                        setTotalCount(r.data.totalCount)
-                        setTotalPage(r.data.totalPage)
-                    }
-                );
-        console.log(setItems);
+        print();
          // 해당 주소에 매핑되는 컨트롤/메소드에 @CrossOrigin(origins = "http://localhost:3000") 추가
     }, [page])
 
@@ -44,9 +51,11 @@ export default function AppTodo(props) {
         const newItems = items.filter( i => i.id !== item.id);
         console.log(item.id);
         axios.delete("/todo", {params : { id : item.id }}).then(r=>{ console.log(r);});
-
             // 삭제할 id를 제외한 newItems배열 선언
         setItems([...newItems]);
+        setPage(1);
+        selectPage(null, 1);
+        print();
     }
     // JS 반복문 함수 제공
                 // 배열/리스트.forEach((o)=>{}) : 반복문만 가능 , 리턴 X
@@ -56,10 +65,11 @@ export default function AppTodo(props) {
     // 4. 수정함수
     const editItem = ()=>{
         setItems([...items]); // 재렌더링
+        print();
     }
     // 5. 페이지 버튼클릭 함수
-    const selectPage = (e) => {
-        setPage(e.target.outerText);
+    const selectPage = (event, value) => {
+        setPage(value);
     }
 
     // 반복문 이용한 Todo 컴포넌트 생성
@@ -86,7 +96,7 @@ export default function AppTodo(props) {
                 {TodoItems}
                 <div style={ { display:'flex' , justifyContent : 'center', margin : '40px 0px' } }>
                     {/* count : 전체 페이지 수 */}
-                    <Pagination count={totalPage} color="primary" onClick={selectPage} />
+                    <Pagination count={totalPage} color="primary" page={page} onChange={selectPage} />
                 </div>
             </Container>
         </div>
