@@ -57,20 +57,27 @@ public class BoardController {
 
     // 게시물 출력
     @GetMapping("")
-    public PageDto list(@RequestParam int cno, @RequestParam int page) {
-        log.info("c list cno : " + cno + " page : " + page );
-        return boardService.list(cno,page);
+    public PageDto list(PageDto pageDto) {
+        return boardService.list(pageDto);
     }
     // 게시물 상세 출력
     @GetMapping("/getboard")
     public BoardDto info(@RequestParam int bno) {
+        log.info("bno :" + bno);
         return boardService.info(bno);
     }
 
     // 게시글 삭제
     @DeleteMapping("")
     public boolean bdelete(@RequestParam int bno) {
-
         return boardService.bdelete(bno);
     }
+
+    // 게시글 수정
+    @PutMapping
+    public boolean bUpdate(@RequestBody BoardDto dto){
+        return boardService.bupdate(dto);
+
+    }
+
 }

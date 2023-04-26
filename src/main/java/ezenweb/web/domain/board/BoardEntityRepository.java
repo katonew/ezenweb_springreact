@@ -16,6 +16,8 @@ public interface BoardEntityRepository extends JpaRepository<BoardEntity, Intege
             // :cno (해당 함수의 매개변수 이름)
     // * cno가 0 인 경우 조건이 존재하지 않는다.
     // cno가 0이면
-    @Query(value = "select * from board where if(:cno=0, cno like '%%' , cno = :cno)", nativeQuery = true)
-    Page<BoardEntity> findBySearch(int cno, Pageable pageable);
+    @Query(value = "select * from board where if(:cno=0, cno like '%%' , cno = :cno) and " +
+            " if(:key='', true, if( :key='btitle', btitle like %:keyword%, bcontent like %:keyword%))  "
+            , nativeQuery = true)
+    Page<BoardEntity> findBySearch(int cno,String key,String keyword , Pageable pageable);
 }

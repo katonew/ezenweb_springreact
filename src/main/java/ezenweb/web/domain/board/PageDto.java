@@ -19,4 +19,8 @@ public class PageDto {
     private int page;
     // 5. 현재 카테고리 번호
     private int cno;
+    // 6. 검색할 필드명
+    private String key;
+    // 7. 검색내용
+    private String keyword;
 }

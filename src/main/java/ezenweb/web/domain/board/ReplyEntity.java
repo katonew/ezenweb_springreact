@@ -24,7 +24,7 @@ public class ReplyEntity {
     // 게시물 FK
     @ManyToOne // 다수가 하나에게 [ FK ===>PK ]
     @JoinColumn(name="bno") // FK필드명
-    @ToString.Exclude // 해당필드는 toString을 사용하지 않음 [ *양방향시 필수 ]
+    //@ToString.Exclude // 해당필드는 toString을 사용하지 않음 [ *양방향시 필수 ]
     private BoardEntity boardEntity ;
 
     // 작성자 FK
@@ -33,7 +33,16 @@ public class ReplyEntity {
     @ToString.Exclude // 해당필드는 toString을 사용하지 않음 [ *양방향시 필수 ]
     private MemberEntity memberEntity;
 
-
+    public ReplyDto toDto(){
+        return ReplyDto.builder()
+                .rno(this.rno)
+                .rcontent(this.rcontent)
+                .rdate(this.rdate)
+                .rindex(this.rindex)
+                .mname(this.memberEntity.getMname())
+                .mno(this.memberEntity.getMno())
+                .build();
+    }
 
 
 

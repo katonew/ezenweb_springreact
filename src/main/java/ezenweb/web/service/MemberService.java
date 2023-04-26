@@ -83,6 +83,7 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         }else{ // 두번째 방문 이상 수정 처리
             entity.setMname(name);
         }
+        dto.setMno(entity.getMno()); // 위에 생성된 혹은 검색된 엔티티의 회원번호
         return dto;
     }
 
