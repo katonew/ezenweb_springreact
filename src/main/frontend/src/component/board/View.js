@@ -1,19 +1,27 @@
 import React,{ useState , useEffect } from 'react';
 import axios from 'axios';
+import Container from '@mui/material/Container';
 import { useParams } from 'react-router-dom'; // HTTP 경로 상의 매개변수 호출 해주는 함수
 import Reply from './Reply'
 
 export default function View( props ) {
    const params = useParams();
 
-   const [ board , setBoard ] = useState( {} );
-   useEffect( ()=>{
+   const getboard = () =>{
         axios.get("/board/getboard" , { params : { bno : params.bno }})
             .then( (r) => {
                 console.log( r.data );
                 setBoard( r.data );
             })
-   } , [ ] )
+   }
+
+   const [ board , setBoard ] = useState( {
+        replyDtoList : []
+   } );
+   useEffect( ()=>{
+        getboard();
+   } , [] )
+
 
     // 삭제 함수
      const onDelete = () =>{
@@ -31,22 +39,101 @@ export default function View( props ) {
    const onUpdate = ()=>{
         window.location.href="/board/update?bno="+board.bno;
    }
+    // 댓글 작성 함수
+       const addReply = (rcontent)=>{
+                   console.log(login.mno)
+                   let info = {
+                       rcontent : rcontent,
+                       rindex : 0,
+                       bno : board.bno,
+                       mno : login.mno
+                   }
+                   axios.post("/reply", info)
+                       .then(r=>{
+                           if(r.data==true){
+                               alert('댓글 작성 완료');
+                               document.querySelector('#rcontent').value = '';
+                               getboard();
+                           }else{
+                               alert('댓글 작성 실패');
+                           }
+
+                       })
+                };
+    // 댓글 삭제 함수
+    const rdelete = (rno)=>{
+        axios.delete("/reply",{params : {"rno": rno}}).then(r=>{
+            console.log(r)
+            if(r.data==true){
+                alert('댓글이 삭제되었습니다.')
+                getboard();
+            }
+        })
+    }
+    // 댓글 수정 함수
+    const rupdate = (rno, rcontent)=>{
+        if(!rcontent){
+            alert('수정 내용이 없습니다.')
+            return;
+        }
+        let info = {
+           rcontent : rcontent,
+           rno : rno
+        }
+        axios.put("/reply",info).then(r=>{
+            console.log(r)
+            if(r.data==true){
+                alert('댓글이 수정되었습니다.')
+                getboard();
+            }
+        })
+    }
+    //대댓글 작성함수
+    const addReReply = (rno,rcontent)=>{
+        let info = {
+           rcontent : rcontent,
+           rindex : rno,
+           bno : board.bno,
+           mno : login.mno
+       }
+       axios.post("/reply", info)
+           .then(r=>{
+               if(r.data==true){
+                   alert('대댓글 작성 완료');
+                   document.querySelector('#rereply'+rno).value = '';
+                   getboard();
+               }else{
+                   alert('대댓글 작성 실패');
+               }
+
+           })
+    }
 
    // 1. 현재 로그인된 회원이 들어왔으면
    const btnBox =
-                login != null && login.mno == board.mno
-                ? <div> <button onClick={ onDelete }>삭제</button>
-                        <button onClick={ onUpdate }>수정</button> </div>
-                : <div> </div>
+        login != null && login.mno == board.mno
+        ? <div> <button onClick={ onDelete }>삭제</button>
+                <button onClick={ onUpdate }>수정</button> </div>
+        : <div> </div>
+
+
 
    return ( <>
-        <div><h6> 카테고리 : {board.cname} </h6> </div>
-        <div><h6> 작성자 : {board.mname} </h6> </div>
-        <div><h6> 작성일 : {board.bdate} </h6> </div>
-        <div><h3> 제목 : {board.btitle} </h3> </div>
-        <div><h3> {board.bcontent} </h3> </div>
-        <Reply bno = {params.bno} />
-        { btnBox }
+        <Container>
+            <div><h6> 카테고리 : {board.cname} </h6> </div>
+            <div><h6> 작성자 : {board.mname} </h6> </div>
+            <div><h6> 작성일 : {board.bdate} </h6> </div>
+            <div><h3> 제목 : {board.btitle} </h3> </div>
+            <div><h3> {board.bcontent} </h3> </div>
+            <Reply
+                replyList={board.replyDtoList}
+                addReply={addReply}
+                rdelete={rdelete}
+                rupdate={rupdate}
+                addReReply={addReReply}
+                />
+            { btnBox }
+        </Container>
 
    </>)
 }

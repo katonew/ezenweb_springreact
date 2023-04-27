@@ -142,7 +142,15 @@ public class BoardService {
     // 게시물 상세 출력
     @Transactional
     public BoardDto info(int bno) {
-        return boardEntityRepository.findById(bno).get().toDto();
+        BoardEntity boardEntity = boardEntityRepository.findById(bno).get();
+        // 댓글 같이~~ 형변환 [ toDto vs service ]
+        List<ReplyDto> list = new ArrayList<>();
+        boardEntity.getReplyEntityArrayList().forEach( (r)->{
+            list.add(r.toDto());
+        });
+        BoardDto result = boardEntity.toDto();
+        result.setReplyDtoList(list);
+        return result;
     }
 
     // 게시글 삭제

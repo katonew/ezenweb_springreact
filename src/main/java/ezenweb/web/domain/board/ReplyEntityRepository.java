@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ReplyEntityRepository extends JpaRepository<ReplyEntity, Integer> {
-    @Query(value = "select r.*,b.* from reply r natural join board b where bno = :bno", nativeQuery = true)
+    @Query(value = "select * from reply where bno = :bno", nativeQuery = true)
     List<ReplyEntity> findAllByBno(String bno);
 }

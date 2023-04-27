@@ -49,6 +49,9 @@ export default function Update( props ) {
         board.bcontent = e.target.value;
         setBoard({...board});
     }
+    const cancel = ()=>{
+        window.location.href="/board/view/"+searchParams.get("bno");
+    }
 
     return (<>
         <Container>
@@ -56,7 +59,7 @@ export default function Update( props ) {
             <TextField fullWidth onChange={inputTitle} value={board.btitle} className="btitle"     id="btitle"  label="제목" variant="standard" />
             <TextField fullWidth onChange={inputContent} value={board.bcontent} className="bcontent"   id="bcontent" label="내용" multiline rows={10} variant="standard" />
             <Button variant="outlined" onClick={  onUpdate }> 수정 </Button>
-            <Button variant="outlined"> 취소 </Button>
+            <Button variant="outlined" onClick={  cancel }> 취소 </Button>
         </Container>
     </>)
 }

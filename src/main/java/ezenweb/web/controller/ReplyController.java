@@ -17,19 +17,27 @@ public class ReplyController {
 
     @Autowired
     private ReplyService replyService;
-
+    /*
+    // 댓글 출력
     @GetMapping("")
     public List<ReplyDto> getList(@RequestParam int bno) {
         log.info("bno : " + bno);
         return replyService.getList(bno);
-    }
+    }*/
+    // 댓글 작성
     @PostMapping("")
     public boolean addReply(@RequestBody ReplyDto dto){
         log.info("replyDto : " + dto);
         return replyService.addReply(dto);
     }
-
-    @DeleteMapping
+    // 댓글 수정
+    @PutMapping("")
+    public boolean replyUpdate(@RequestBody ReplyDto dto){
+        return replyService.replyUpdate(dto);
+    }
+    
+    // 댓글 삭제
+    @DeleteMapping("")
     public boolean deleteReply(@RequestParam int rno){
         return replyService.deleteReply(rno);
     }

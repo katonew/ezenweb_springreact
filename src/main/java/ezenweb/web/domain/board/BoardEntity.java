@@ -31,8 +31,6 @@ public class BoardEntity extends BaseTime {
 
     // FK(외래키) 설정 [ 카테고리번호 = cno , 회원번호 = mno ]
     
-    
-    
     // 카테고리 번호
     @ManyToOne // 다수가 하나에게 [ FK ===>PK ]
     @JoinColumn(name="cno") // FK필드명

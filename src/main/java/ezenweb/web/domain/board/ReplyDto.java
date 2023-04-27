@@ -30,8 +30,6 @@ public class ReplyDto {
                 .rno(this.rno)
                 .rcontent(this.rcontent)
                 .rindex(this.rindex)
-                .rdate(new Date().toString())
-
                 .build();
     }
 

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data@AllArgsConstructor@NoArgsConstructor@Builder
 public class BoardDto {
@@ -24,6 +26,7 @@ public class BoardDto {
     private int bview; // 조회수
 
     // 댓글 목록
+    private List<ReplyDto> replyDtoList = new ArrayList<>();
 
 
     // 엔티티 변환 메소드
