@@ -43,57 +43,111 @@ export default function Reply( props ) {
     }
 
     // 댓글 출력 조정
-    const PrintReply = (list) =>{
-        const tree = [];
-        console.log('qwwewqew')
-        list.forEach((o)=>{
-            if(o.rindex===0){
-                tree[o.rno]={
-                    item : {
-                        id : o.rindex,
-                        rno : o.rno,
-                        mname : o.mname,
-                        rdate : o.rdate,
-                        rcontent : o.rcontent
-                    },
-                    children : []
-                }
-            } else if(o.rindex!==0){
-                {console.log(tree[o.rindex])}
-                tree[o.rindex].children = {
-                    item : {
-                        id : o.rindex,
-                        rno : o.rno,
-                        mname : o.mname,
-                        rdate : o.rdate,
-                        rcontent : o.rcontent
+    const PrintReply = (list) => {
+      const tree = {};
+
+      list.forEach((o) => {
+        if (o.rindex === 0) {
+          tree[o.rno] = {
+            item: {
+              rno: o.rno,
+              mno : o.mno,
+              mname: o.mname,
+              rdate: o.rdate,
+              rcontent: o.rcontent,
+            },
+            children: [],
+          };
+        } else {
+          const parentNode = tree[o.rindex];
+
+          if (parentNode) {
+            if (!parentNode.children) {
+              parentNode.children = [];
+            }
+
+            parentNode.children.push({
+              item: {
+                rno: o.rno,
+                mno : o.mno,
+                mname: o.mname,
+                rdate: o.rdate,
+                rcontent: o.rcontent,
+              },
+              children: [],
+            });
+          }
+        }
+      });
+
+      const printList = [];
+      console.log(tree);
+      for (const key in tree) {
+        const node = tree[key];
+        const treeItems = []
+        const children = node.children.length ? node.children : null;
+        treeItems.push(<>
+           <TextField
+                fullWidth
+                id={`rereply${node.item.rno}`}
+                label="대댓글"
+                variant="standard"
+              />
+          <Button
+            onClick={(e) =>
+              addReReplyHandler(e, node.item.rno)
+            }
+            variant="outlined"
+          >
+            댓글달기
+          </Button></>
+        )
+        for (const key in children){
+            const child = children[key];
+            treeItems.push(
+                <TreeItem
+                    key={child.item.rno}
+                    nodeId={child.item.rno}
+                    label={
+                        <div>
+                            <h5> {child.item.mname} / {child.item.rdate} </h5>
+                            <div>{child.item.rcontent}</div>
+                            <div>
+                                {login.mno == child.item.mno ? (
+                                    <Button onClick={(e) => rupdateHandler(e, child.item.rno, child.item.rcontent)} variant="outlined">수정</Button>
+                                ) : (<></>)}
+                                {login.mno == child.item.mno ? (
+                                    <Button onClick={(e) => rdeleteHandler(e, child.item.rno)}  variant="outlined" >삭제</Button>
+                                ) : (<></>)}
+                            </div>
+                        </div>
                     }
-                }
-            } // if e
-        }) // forEach e
-        console.log(tree)
-        const printList = tree.map((i) => {
+                />
+            );
+        }
+        printList.push(
           <TreeItem
-              nodeId={i.item.rno}
-              label={
+            key={node.item.rno}
+            nodeId={node.item.rno}
+            label={
+              <div>
+                <h5> {node.item.mname} / {node.item.rdate} </h5>
+                <div>{node.item.rcontent}</div>
                 <div>
-                  <h5> {i.item.mname} / {i.item.rdate}</h5>
-                  <div> {i.item.rcontent} </div>
-                  <div>
-                    {login.mno == i.item.mno ?
-                      <Button onClick={(e) => rupdateHandler(e, i.item.rno, i.item.rcontent)} variant="outlined">수정</Button>
-                      : <></>}
-                    {login.mno == i.item.mno ?
-                      <Button onClick={(e) => rdeleteHandler(e, i.item.rno)} variant="outlined">삭제</Button>
-                      : <></>}
-                    <TextField fullWidth id={`rereply${i.item.rno}`} label="대댓글" variant="standard" />
-                    <Button onClick={(e) => addReReplyHandler(e, i.item.rno)} variant="outlined">댓글달기</Button>
-                  </div>
+                  {login.mno == node.item.mno ? (
+                    <Button onClick={(e) => rupdateHandler(e, node.item.rno, node.item.rcontent)} variant="outlined">수정</Button>
+                  ) : (<></>)}
+                  {login.mno == node.item.mno ? (
+                    <Button onClick={(e) => rdeleteHandler(e, node.item.rno)}  variant="outlined" >삭제</Button>
+                  ) : (<></>)}
                 </div>
-              }
-            />
-        });
-        return printList;
+              </div>
+            }
+          >
+          {treeItems}
+          </TreeItem>
+        )};
+        return [printList];
     }
 
 
@@ -103,7 +157,7 @@ export default function Reply( props ) {
             <Button onClick={addReplyHandler} variant="outlined"> 등록 </Button>
             <h3>댓글창</h3>
             {<TreeView>
-                {console.log(PrintReply(props.replyList))}
+                {PrintReply(props.replyList)}
             </TreeView>}
         </Paper>
 
