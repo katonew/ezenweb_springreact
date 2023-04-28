@@ -18,6 +18,8 @@ export default function Reply( props ) {
                 setReplyList(r.data)
             })
     },[])*/
+
+
     const [ login , setLogin ] = useState( JSON.parse( sessionStorage.getItem('login_token') ) )
 
     // 댓글 작성 핸들러
@@ -73,8 +75,7 @@ export default function Reply( props ) {
                 mname: o.mname,
                 rdate: o.rdate,
                 rcontent: o.rcontent,
-              },
-              children: [],
+              }
             });
           }
         }
@@ -87,38 +88,58 @@ export default function Reply( props ) {
         const treeItems = []
         const children = node.children.length ? node.children : null;
         treeItems.push(<>
-           <TextField
-                fullWidth
-                id={`rereply${node.item.rno}`}
-                label="대댓글"
-                variant="standard"
-              />
-          <Button
-            onClick={(e) =>
-              addReReplyHandler(e, node.item.rno)
-            }
-            variant="outlined"
-          >
-            댓글달기
-          </Button></>
-        )
+            <div style={{
+                       display: 'flex',
+                       justifyContent : 'space-between'
+                     }}>
+               <TextField
+                    fullWidth
+                    id={`rereply${node.item.rno}`}
+                    label="대댓글"
+                    variant="standard"
+                  />
+              <Button
+                style={{width:'10%'}}
+                onClick={(e) =>
+                  addReReplyHandler(e, node.item.rno)
+                }
+                variant="outlined"
+              >
+                댓글달기
+              </Button>
+          </div>
+          </>)
         for (const key in children){
             const child = children[key];
             treeItems.push(
                 <TreeItem
+                    style={{
+                           border: '1px solid black',
+                           borderRadius: '4px',
+                           padding: '4px',
+                           margin: '4px',
+                           width: '70%',
+                           position: 'relative',
+                           left: '250px',
+                         }}
                     key={child.item.rno}
                     nodeId={child.item.rno}
                     label={
                         <div>
                             <h5> {child.item.mname} / {child.item.rdate} </h5>
-                            <div>{child.item.rcontent}</div>
-                            <div>
-                                {login.mno == child.item.mno ? (
-                                    <Button onClick={(e) => rupdateHandler(e, child.item.rno, child.item.rcontent)} variant="outlined">수정</Button>
-                                ) : (<></>)}
-                                {login.mno == child.item.mno ? (
-                                    <Button onClick={(e) => rdeleteHandler(e, child.item.rno)}  variant="outlined" >삭제</Button>
-                                ) : (<></>)}
+                            <div style={{
+                                       display: 'flex',
+                                       justifyContent : 'space-between'
+                                     }}>
+                                <div>{child.item.rcontent}</div>
+                                <div style={{marginRight : '10px'}}>
+                                    {login.mno == child.item.mno ? (
+                                        <Button onClick={(e) => rupdateHandler(e, child.item.rno, child.item.rcontent)} variant="outlined">수정</Button>
+                                    ) : (<></>)}
+                                    {login.mno == child.item.mno ? (
+                                        <Button onClick={(e) => rdeleteHandler(e, child.item.rno)}  variant="outlined" >삭제</Button>
+                                    ) : (<></>)}
+                                </div>
                             </div>
                         </div>
                     }
@@ -127,19 +148,33 @@ export default function Reply( props ) {
         }
         printList.push(
           <TreeItem
+            style={{
+                   border: '1px solid black',
+                   borderRadius: '4px',
+                   padding: '4px',
+                   margin: '4px',
+                 }}
             key={node.item.rno}
             nodeId={node.item.rno}
             label={
               <div>
                 <h5> {node.item.mname} / {node.item.rdate} </h5>
-                <div>{node.item.rcontent}</div>
                 <div>
-                  {login.mno == node.item.mno ? (
-                    <Button onClick={(e) => rupdateHandler(e, node.item.rno, node.item.rcontent)} variant="outlined">수정</Button>
-                  ) : (<></>)}
-                  {login.mno == node.item.mno ? (
-                    <Button onClick={(e) => rdeleteHandler(e, node.item.rno)}  variant="outlined" >삭제</Button>
-                  ) : (<></>)}
+
+                    <div style={{
+                            display: 'flex',
+                            justifyContent : 'space-between'
+                          }}>
+                      <div>{node.item.rcontent}</div>
+                      <div style={{marginRight : '10px'}}>
+                          {login.mno == node.item.mno ? (
+                            <Button onClick={(e) => rupdateHandler(e, node.item.rno, node.item.rcontent)} variant="outlined">수정</Button>
+                          ) : (<></>)}
+                          {login.mno == node.item.mno ? (
+                            <Button onClick={(e) => rdeleteHandler(e, node.item.rno)}  variant="outlined" >삭제</Button>
+                          ) : (<></>)}
+                      </div>
+                    </div>
                 </div>
               </div>
             }
@@ -153,12 +188,12 @@ export default function Reply( props ) {
 
     let replybox =
         <Paper style={{margin : 16}}>
-            <TextField fullWidth className="rcontent" id="rcontent" label="댓글" variant="standard" />
-            <Button onClick={addReplyHandler} variant="outlined"> 등록 </Button>
             <h3>댓글창</h3>
             {<TreeView>
                 {PrintReply(props.replyList)}
             </TreeView>}
+            <TextField fullWidth className="rcontent" id="rcontent" label="댓글" variant="standard" />
+            <Button onClick={addReplyHandler} variant="outlined"> 등록 </Button>
         </Paper>
 
 

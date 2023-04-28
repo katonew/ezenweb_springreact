@@ -1,8 +1,10 @@
 import React,{ useState , useEffect } from 'react';
 import axios from 'axios';
 import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
 import { useParams } from 'react-router-dom'; // HTTP 경로 상의 매개변수 호출 해주는 함수
 import Reply from './Reply'
+
 
 export default function View( props ) {
    const params = useParams();
@@ -112,19 +114,31 @@ export default function View( props ) {
    // 1. 현재 로그인된 회원이 들어왔으면
    const btnBox =
         login != null && login.mno == board.mno
-        ? <div> <button onClick={ onDelete }>삭제</button>
-                <button onClick={ onUpdate }>수정</button> </div>
+        ? <div> <Button onClick={ onDelete } variant="outlined">삭제</Button>
+                <Button onClick={ onUpdate } variant="outlined">수정</Button> </div>
         : <div> </div>
 
 
 
    return ( <>
         <Container>
-            <div><h6> 카테고리 : {board.cname} </h6> </div>
-            <div><h6> 작성자 : {board.mname} </h6> </div>
-            <div><h6> 작성일 : {board.bdate} </h6> </div>
-            <div><h3> 제목 : {board.btitle} </h3> </div>
-            <div><h3> {board.bcontent} </h3> </div>
+            <div style={{
+                display:'flex',
+                justifyContent : 'space-between',
+                border : '1px solid black'
+            }}>
+                <div><h1> 제목 : {board.btitle} </h1> </div>
+                <div style={{border : '1px solid black'}}>
+                    <div><h6> 카테고리 : {board.cname} </h6> </div>
+                    <div><h6> 작성자 : {board.mname} </h6> </div>
+                    <div><h6> 작성일 : {board.bdate} </h6> </div>
+                </div>
+            </div>
+            <div style={{
+                border : '1px solid black',
+                width : '100%',
+                height : '500px'
+            }}><h3> {board.bcontent} </h3> </div>
             <Reply
                 replyList={board.replyDtoList}
                 addReply={addReply}
