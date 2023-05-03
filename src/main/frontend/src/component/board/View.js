@@ -24,6 +24,10 @@ export default function View( props ) {
         getboard();
    } , [] )
 
+   const boardreload = () =>{
+        setBoard( [...board] );
+   }
+
 
     // 삭제 함수
      const onDelete = () =>{
@@ -85,7 +89,7 @@ export default function View( props ) {
         axios.put("/reply",info).then(r=>{
             console.log(r)
             if(r.data==true){
-                alert('댓글이 수정되었습니다.')
+                alert('수정 되었습니다.')
                 getboard();
             }
         })
@@ -144,6 +148,7 @@ export default function View( props ) {
                 addReply={addReply}
                 rdelete={rdelete}
                 rupdate={rupdate}
+                boardreload = {boardreload}
                 addReReply={addReReply}
                 />
             { btnBox }

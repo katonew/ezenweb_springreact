@@ -31,6 +31,7 @@ export default function Header(props) {
             <a href="/board/list"> 게시판 </a>
             <a href="/AppTodo"> todo </a>
             <a href="/admin/dashboard"> 관리자 </a>
+            <a href="chatting/home"> 익명 채팅 </a>
             {
                 login == null
                 ? ( <>
