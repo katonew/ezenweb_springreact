@@ -37,6 +37,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // super.configure(http); super : 부모 클래스 호출
         http
+                .authorizeHttpRequests() // 인증 권한에 따른 요청 제한
+                    .antMatchers("/admin/**").hasRole("ADMIN")
+                    .antMatchers("/board/update").hasRole("USER")
+                    //.antMatchers("/board/delete").access("hasRole('ADMIN') or hasRole('USER')")
+                    .antMatchers("board/delete").hasAnyRole("USER","Admin")
+                    .antMatchers("/board/write").hasRole("USER")
+                    .antMatchers("/**").permitAll()
+                .and()
                 .formLogin()
                     .loginPage("/member/login")             // 로그인 페이지로 사용할 매핑 URL
                     .loginProcessingUrl("/member/login")    // 로그인 처리할 매핑 URL

@@ -1,16 +1,17 @@
 package ezenweb.web.domain.product;
 
 import ezenweb.web.domain.BaseTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import ezenweb.web.domain.file.FileDto;
+import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data@AllArgsConstructor@NoArgsConstructor@Builder
 @Entity@Table(name = "product")
@@ -44,6 +45,12 @@ public class ProductEntity extends BaseTime {
     private int pstock;// 제품재고/수량
 
     // 제품이미지 [ one to many ]
+    // 제약조건 : pk객체가 삭제되면 fk의 행방
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.REMOVE) // pk필드 선언시 mappedBy="FK에서 식별하는 PK명"
+    @ToString.Exclude
+    @Builder.Default
+    private List<ProductImgEntity> productImgEntityList = new ArrayList<>();
+
     // 구매내역 [ one to many ]
 
     // 1. 출력용 [ 관리자페이지에서 ]
@@ -62,7 +69,23 @@ public class ProductEntity extends BaseTime {
                 .build();
     }
     // 2. 출력용 [ 메인페이지에서 ]
-    //public ProductDto toMainDto(){ }
+    public ProductDto toMainDto(){
+        List<FileDto> list =
+        this.getProductImgEntityList().stream().map(
+            img-> img.toFileDto()
+        ).collect(Collectors.toList());
+
+        return ProductDto.builder()
+                .id(this.id)
+                .pprice(this.pprice)
+                .pname(this.pname)
+                .pcategory(this.pcategory)
+                .pmanufacturer(this.pmanufacturer)
+                .pstate(this.pstate)
+                .pstock(this.pstock)
+                .files(list)
+                .build();
+    }
 
 }
 

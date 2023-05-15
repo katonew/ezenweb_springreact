@@ -22,7 +22,7 @@ public class ProductController { /* 리액트와 통신역할 */
     }
 
     @PostMapping("")
-    public boolean post(@RequestBody ProductDto productDto){
+    public boolean post(ProductDto productDto){
         return productService.post(productDto);
     }
     @PutMapping("")
@@ -34,5 +34,11 @@ public class ProductController { /* 리액트와 통신역할 */
     public boolean delete(@RequestParam String id){
         return productService.delete(id);
     }
+
+    @GetMapping("/main")
+    public List<ProductDto> mainGet(){
+        return productService.mainGet();
+    }
+
 
 }

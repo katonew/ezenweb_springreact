@@ -26,15 +26,12 @@ public class FileService {
 
 
     // * 첨부파일 저장 할 경로 [ 1. 배포 전 2. 배포 후 ]
-    String path = "c:\\java\\";
-    
+    String path = "C:\\Users\\504\\IdeaProjects\\ezenweb_springreact\\build\\resources\\main\\static\\static\\media\\";
+    // C:\Users\504\IdeaProjects\ezenweb_springreact\src\main\resources\static\static\media
+
+
     // chat 관련 첨부파일 업로드
     public FileDto fileUpload(MultipartFile multipartFile){
-        log.info("File upload multipartFile : " + multipartFile);
-        log.info("File upload Filename : " + multipartFile.getOriginalFilename()); // 실제 첨부파일 파일명 
-        log.info("File upload Name : " + multipartFile.getName()); //input의 name 값
-        log.info("File upload ContentType : " + multipartFile.getContentType()); // 첨부파일 분류/첨부파일 확장자
-        log.info("File upload Size : " + multipartFile.getSize()); // 바이트크기
 
         // 1. 첨부파일 존재하는지 확인
         if(!multipartFile.getOriginalFilename().equals("")){ // 첨부파일이 존재하면
