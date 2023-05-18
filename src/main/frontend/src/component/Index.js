@@ -42,7 +42,7 @@ export default function Index(props){
 
                 <Route path="/admin/dashboard" element = { <DashBoard/> } />
 
-                <Route path="/AppTodo" element = { <AppTodo/> } />
+                {/*<Route path="/AppTodo" element = { <AppTodo/> } />*/}
 
                 <Route path="/chatting/home" element = { <Chatting/> } />
             </Routes>
