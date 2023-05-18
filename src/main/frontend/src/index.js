@@ -3,15 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App'; // 1. import 이용해 App 컴포넌트[함수] 를 불러온다
 import reportWebVitals from './reportWebVitals';
-import Book from './example/ex1component/Book';
-import Product from './example/ex1component/Product';
-import ProductList from './example/ex1component/ProductList';
-import Clock from './example/ex1component/Clock';
-import Comment from './example/ex2css/Comment';
-import CommentList from './example/ex2css/CommentList';
-import AppTodo from './example/exbook/AppTodo';
-import Hook1 from './example/ex3hook/Hook1'
-import Hook2 from './example/ex3hook/Hook2'
 import Index from './component/Index'
 // 1. HTML에 존재하는 div 가져오기
 // 2. ReactDOM.createRoot(div) : 해당 div를 react root로 사용하여 root 객체 생성

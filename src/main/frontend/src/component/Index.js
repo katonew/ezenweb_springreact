@@ -12,7 +12,7 @@ import View from "./board/View"
 import Chatting from "./board/Chatting"
 import Update from "./board/Update"
 import DashBoard from "./admin/DashBoard"
-import AppTodo from "../example/exbook/AppTodo"
+//import AppTodo from "../example/exbook/AppTodo"
 
 
 /*
